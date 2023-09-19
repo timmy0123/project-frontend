@@ -3,6 +3,7 @@ import Head from "next/head";
 import { AppProps } from "next/app";
 import { createEmotionCache } from "../utils/create-emotion-cache";
 import { CacheProvider, EmotionCache } from "@emotion/react";
+import { ObjectProvider } from "@/lib/core/main-content";
 import { useEffect, useState } from "react";
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -47,8 +48,10 @@ export default function MyApp(props: MyAppProps) {
         <title> {isBrowsingPage}</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <Component {...pageProps} />
+      <ObjectProvider>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <Component {...pageProps} />
+      </ObjectProvider>
     </CacheProvider>
   );
 }
