@@ -1,0 +1,15 @@
+@import "./css/component-adaptive-editor.css";
+@import "../../node_modules/monaco-editor/esm/vs/base/browser/ui/actionbar/actionbar.css";
+@import "../../node_modules/monaco-editor/esm/vs/base/browser/ui/aria/aria.css";
+
+body {
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
+}
