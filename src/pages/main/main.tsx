@@ -50,7 +50,8 @@ export const MainContent: React.FC = ({}) => {
     dayjs("2019-07-25T15:30").utc()
   );
   const [Region, setRegion] = React.useState("UK");
-  const { Event, eventStatistic } = useCellContent();
+  const { Event, eventStatistic, Line, setLine, Point, setPoint } =
+    useCellContent();
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", type: "string", width: 150 },
@@ -71,9 +72,9 @@ export const MainContent: React.FC = ({}) => {
   }, [Event]);
 
   return (
-    <>
+    <div>
       <_Map />
-      <Stack width="100wh" height="100vh" spacing={3}>
+      <Stack width="95wh" height="95vh" spacing={3}>
         <Grid container width="100%">
           <Grid item xs={4.75} />
           <Grid item xs={1}>
@@ -275,8 +276,40 @@ export const MainContent: React.FC = ({}) => {
                       }}
                       pageSizeOptions={[5, 8]}
                       checkboxSelection
-                      onRowSelectionModelChange={(newSelection) => {
-                        console.log(newSelection);
+                      onRowSelectionModelChange={async (newSelection) => {
+                        let _point: number[][] = [];
+                        let _line: number[][][] = [];
+                        let n = newSelection.length;
+                        if (n == 0) {
+                          setLine(_line);
+                          setPoint(_point);
+                        } else {
+                          for (let i = 0; i < n; i++) {
+                            let lifespans = await q.queryTrack(
+                              newSelection[i] as string
+                            );
+                            if (lifespans) {
+                              let m = lifespans.length;
+                              for (let j = 0; j < m; j++) {
+                                let l = lifespans[j].length;
+                                let singleLine: number[][] = [];
+                                for (let k = 0; k < l; k++) {
+                                  let coord = await q.queryProp(
+                                    lifespans[j][k] as string,
+                                    Region
+                                  );
+                                  if (coord && coord.length > 1) {
+                                    singleLine.push(coord.reverse());
+                                    _point.push(coord.reverse());
+                                  }
+                                }
+                                _line.push(singleLine);
+                              }
+                            }
+                          }
+                          setPoint(_point);
+                          setLine(_line);
+                        }
                       }}
                     />
                   </Box>
@@ -288,6 +321,6 @@ export const MainContent: React.FC = ({}) => {
           </Grid>
         </Grid>
       </Stack>
-    </>
+    </div>
   );
 };

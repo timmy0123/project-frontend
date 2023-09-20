@@ -5,6 +5,7 @@ import { createEmotionCache } from "../utils/create-emotion-cache";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import { ObjectProvider } from "@/lib/core/main-content";
 import { useEffect, useState } from "react";
+import "../styles/global.scss";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();

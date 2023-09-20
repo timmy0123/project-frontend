@@ -16,8 +16,8 @@ const StyledMap = styled("div")(({ theme }) => ({
   position: "absolute",
   "& .mapboxgl-ctrl-attrib-button": {
     position: "fixed",
-    bottom: theme.spacing(0.5),
-    left: theme.spacing(0.5),
+    bottom: theme.spacing(1),
+    left: theme.spacing(1),
   },
   "& .mapboxgl-control-container": {
     display: "none",
@@ -34,8 +34,12 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
   const [zoom, setZoom] = React.useState(5);
   const { lng, lat } = { lng: -2, lat: 55 };
   const mapApi = React.useRef(new MapAPIContent(map.current));
-  const { eventStatistic } = useCellContent();
+  const { eventStatistic, Line, Point } = useCellContent();
 
+  React.useEffect(() => {
+    mapApi.current.drawLine(Line);
+    mapApi.current.drawPoint(Point);
+  }, [Line]);
   React.useEffect(() => {
     if (!map.current) {
       map.current = new mapboxgl.Map({
