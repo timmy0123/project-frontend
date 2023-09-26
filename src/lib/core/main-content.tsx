@@ -31,6 +31,7 @@ export interface properityType {
     lev: number;
   };
   pts: number[][];
+  ellipse: number[][];
   elHist: {
     smjr: number;
     smnr: number;
@@ -55,14 +56,18 @@ export interface properityType {
 }
 
 export interface cellObjecttype {
+  Cell: Map<string, properityType>;
+  setCell: React.Dispatch<Map<string, properityType>>;
   Event: eventtype[];
   setEvent: React.Dispatch<React.SetStateAction<eventtype[]>>;
   eventStatistic: statistictype[];
   seteventStatistic: React.Dispatch<React.SetStateAction<statistictype[]>>;
-  Line: number[][][];
-  setLine: React.Dispatch<React.SetStateAction<number[][][]>>;
-  Point: number[][];
-  setPoint: React.Dispatch<React.SetStateAction<number[][]>>;
+  Line: Map<string, number[][]>;
+  setLine: React.Dispatch<React.SetStateAction<Map<string, number[][]>>>;
+  Point: Map<string, number[]>;
+  setPoint: React.Dispatch<React.SetStateAction<Map<string, number[]>>>;
+  Polygon: Map<string, number[][]>;
+  setPolygon: React.Dispatch<React.SetStateAction<Map<string, number[][]>>>;
 }
 
 interface content {
@@ -70,28 +75,38 @@ interface content {
 }
 
 export const cellContext = React.createContext<cellObjecttype>({
+  Cell: new Map(),
+  setCell: () => {},
   Event: [],
   setEvent: () => {},
   eventStatistic: [],
   seteventStatistic: () => {},
-  Line: [],
+  Line: new Map(),
   setLine: () => {},
-  Point: [],
+  Point: new Map(),
   setPoint: () => {},
+  Polygon: new Map(),
+  setPolygon: () => {},
 });
 
 export const useCellContent = () => React.useContext(cellContext);
 
 export const ObjectProvider = React.memo<content>(({ children }) => {
+  const [Cell, setCell] = React.useState<Map<string, properityType>>(new Map());
   const [Event, setEvent] = React.useState<eventtype[]>([]);
   const [eventStatistic, seteventStatistic] = React.useState<statistictype[]>(
     []
   );
-  const [Line, setLine] = React.useState<number[][][]>([]);
-  const [Point, setPoint] = React.useState<number[][]>([]);
+  const [Line, setLine] = React.useState<Map<string, number[][]>>(new Map());
+  const [Point, setPoint] = React.useState<Map<string, number[]>>(new Map());
+  const [Polygon, setPolygon] = React.useState<Map<string, number[][]>>(
+    new Map()
+  );
   return (
     <cellContext.Provider
       value={{
+        Cell,
+        setCell,
         Event,
         setEvent,
         eventStatistic,
@@ -100,6 +115,8 @@ export const ObjectProvider = React.memo<content>(({ children }) => {
         setLine,
         Point,
         setPoint,
+        Polygon,
+        setPolygon,
       }}
     >
       {children}

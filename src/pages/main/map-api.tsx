@@ -12,7 +12,7 @@ export class MapAPIContent {
     this.map = map;
   };
 
-  public drawLine(Line: number[][][]) {
+  public drawLine(Line: Map<string, number[][]>) {
     if (this.map?.getSource("Track") == undefined) {
       this.map?.addSource("Track", {
         type: "geojson",
@@ -40,23 +40,23 @@ export class MapAPIContent {
         },
       });
     }
-    if (Line.length > 0) {
-      let idx = 0;
+    if (Line.size > 0) {
       let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
-      for (let idx = 0; idx < Line.length; idx++) {
+      Line.forEach((value, key, map) => {
         let feat: GeoJSON.Feature<GeoJSON.Geometry> = {
           type: "Feature",
-          id: idx.toString(),
+          id: key.toString(),
           properties: {
-            name: idx,
+            name: key,
           },
           geometry: {
             type: "LineString",
-            coordinates: Line[idx],
+            coordinates: value,
           },
         };
         Features.push(feat);
-      }
+      });
+
       let map = this.map?.getSource("Track") as GeoJSONSource;
 
       if (map) {
@@ -76,7 +76,7 @@ export class MapAPIContent {
     }
   }
 
-  public drawPoint(Point: number[][]) {
+  public drawPoint(Point: Map<string, number[]>) {
     if (this.map?.getSource("Cell") == undefined) {
       this.map?.addSource("Cell", {
         type: "geojson",
@@ -104,24 +104,23 @@ export class MapAPIContent {
       });
     }
     console.log(Point);
-    if (Point.length > 0) {
-      let idx = 0;
+    if (Point.size > 0) {
       let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
-      console.log(Point.length);
-      for (let idx = 0; idx < Point.length; idx++) {
+      Point.forEach((value, key, map) => {
         let feat: GeoJSON.Feature<GeoJSON.Geometry> = {
           type: "Feature",
-          id: idx.toString(),
+          id: key.toString(),
           properties: {
-            name: idx,
+            name: key,
           },
           geometry: {
             type: "Point",
-            coordinates: Point[idx],
+            coordinates: value,
           },
         };
         Features.push(feat);
-      }
+      });
+      console.log(Features);
       let map = this.map?.getSource("Cell") as GeoJSONSource;
 
       if (map) {
@@ -132,6 +131,79 @@ export class MapAPIContent {
       }
     } else {
       let map = this.map?.getSource("Cell") as GeoJSONSource;
+      if (map) {
+        map.setData({
+          type: "FeatureCollection",
+          features: [],
+        });
+      }
+    }
+  }
+
+  public drawArea(Polygon: Map<string, number[][]>) {
+    if (this.map?.getSource("Area") == undefined) {
+      this.map?.addSource("Area", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
+      this.map?.addLayer({
+        id: "Area",
+        type: "fill",
+        source: "Area",
+        layout: {},
+        paint: {
+          "fill-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "blue",
+            "#0080ff",
+          ], // blue color fill
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            0.5,
+          ],
+          "fill-outline-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "blue",
+            "#0080ff",
+          ],
+        },
+      });
+    }
+    console.log(Polygon);
+    if (Polygon.size > 0) {
+      let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
+      Polygon.forEach((value, key, map) => {
+        let feat: GeoJSON.Feature<GeoJSON.Geometry> = {
+          type: "Feature",
+          id: key.toString(),
+          properties: {
+            name: key,
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [value],
+          },
+        };
+        Features.push(feat);
+      });
+
+      let map = this.map?.getSource("Area") as GeoJSONSource;
+
+      if (map) {
+        map.setData({
+          type: "FeatureCollection",
+          features: Features,
+        });
+      }
+    } else {
+      let map = this.map?.getSource("Area") as GeoJSONSource;
       if (map) {
         map.setData({
           type: "FeatureCollection",

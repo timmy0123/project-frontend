@@ -59,12 +59,12 @@ export class Query {
   public queryProp = async (
     id: string,
     ProjName: string
-  ): Promise<number[] | undefined> => {
+  ): Promise<properityType | undefined> => {
     const response = await fetch(
       `http://localhost:5566/getCellProp?id=${id}&ProjName=${ProjName}`
     );
     const result: properityType = await response.json();
-    if (result) return [result.elHist.ctrd1, result.elHist.ctrd0];
+    if (result) return result;
     else return undefined;
   };
 }
