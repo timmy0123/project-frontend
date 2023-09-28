@@ -34,7 +34,7 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
   const [zoom, setZoom] = React.useState(5);
   const { lng, lat } = { lng: -2, lat: 55 };
   const mapApi = React.useRef(new MapAPIContent(map.current));
-  const { eventStatistic, Line, Point, Polygon } = useCellContent();
+  const { eventStatistic, Line, Point, Polygon, setLoaded } = useCellContent();
 
   React.useEffect(() => {
     mapApi.current.drawLine(Line);
@@ -54,6 +54,7 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
 
     map.current.setCenter([lng, lat]);
     map.current.setZoom(zoom);
+    setLoaded(true);
   }, [onLoaded]);
   return (
     <>

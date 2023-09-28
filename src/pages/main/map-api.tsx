@@ -103,7 +103,7 @@ export class MapAPIContent {
         filter: ["in", "$type", "Point"],
       });
     }
-    console.log(Point);
+
     if (Point.size > 0) {
       let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
       Point.forEach((value, key, map) => {
@@ -120,7 +120,7 @@ export class MapAPIContent {
         };
         Features.push(feat);
       });
-      console.log(Features);
+
       let map = this.map?.getSource("Cell") as GeoJSONSource;
 
       if (map) {
@@ -176,7 +176,7 @@ export class MapAPIContent {
         },
       });
     }
-    console.log(Polygon);
+
     if (Polygon.size > 0) {
       let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
       Polygon.forEach((value, key, map) => {

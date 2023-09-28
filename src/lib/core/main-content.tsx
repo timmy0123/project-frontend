@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 
 export interface eventtype {
   _id: string;
@@ -32,6 +33,7 @@ export interface properityType {
   };
   pts: number[][];
   ellipse: number[][];
+  cellPolygon: number[][];
   elHist: {
     smjr: number;
     smnr: number;
@@ -56,6 +58,8 @@ export interface properityType {
 }
 
 export interface cellObjecttype {
+  Loaded: boolean;
+  setLoaded: React.Dispatch<boolean>;
   Cell: Map<string, properityType>;
   setCell: React.Dispatch<Map<string, properityType>>;
   Event: eventtype[];
@@ -75,18 +79,20 @@ interface content {
 }
 
 export const cellContext = React.createContext<cellObjecttype>({
+  Loaded: false,
+  setLoaded: _.noop,
   Cell: new Map(),
-  setCell: () => {},
+  setCell: _.noop,
   Event: [],
-  setEvent: () => {},
+  setEvent: _.noop,
   eventStatistic: [],
-  seteventStatistic: () => {},
+  seteventStatistic: _.noop,
   Line: new Map(),
-  setLine: () => {},
+  setLine: _.noop,
   Point: new Map(),
-  setPoint: () => {},
+  setPoint: _.noop,
   Polygon: new Map(),
-  setPolygon: () => {},
+  setPolygon: _.noop,
 });
 
 export const useCellContent = () => React.useContext(cellContext);
@@ -102,9 +108,12 @@ export const ObjectProvider = React.memo<content>(({ children }) => {
   const [Polygon, setPolygon] = React.useState<Map<string, number[][]>>(
     new Map()
   );
+  const [Loaded, setLoaded] = React.useState<boolean>(false);
   return (
     <cellContext.Provider
       value={{
+        Loaded,
+        setLoaded,
         Cell,
         setCell,
         Event,
