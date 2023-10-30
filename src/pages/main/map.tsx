@@ -1,8 +1,9 @@
 import mapboxgl from "mapbox-gl";
-import { MapAPIContent } from "./map-api";
+import { MapAPIContent } from "../../lib/mapApi/map-api";
 import * as React from "react";
 import { styled } from "../../styles";
 import { eventtype, useCellContent } from "@/lib/core/main-content";
+import exp from "constants";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_KEY as string;
 export interface IMap {
@@ -213,3 +214,5 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
 });
 
 _Map.displayName = "_Map";
+
+export default _Map;

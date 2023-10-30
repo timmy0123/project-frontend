@@ -25,7 +25,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import utc from "dayjs/plugin/utc";
-import { Query } from "./query";
+import { Query } from "../../lib/query/query";
 import { useCellContent } from "@/lib/core/main-content";
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
@@ -600,6 +600,8 @@ export const MainContent: React.FC = ({}) => {
     </StylesProvider>
   );
 };
+
+export default MainContent;
 //<Stack
 //width="95wh"
 //height="95vh"
