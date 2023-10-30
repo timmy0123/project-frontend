@@ -212,4 +212,77 @@ export class MapAPIContent {
       }
     }
   }
+
+  public drawEllipse(Ellipse: Map<string, number[][]>) {
+    if (this.map?.getSource("Ellipse") == undefined) {
+      this.map?.addSource("Ellipse", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
+      this.map?.addLayer({
+        id: "Ellipse",
+        type: "fill",
+        source: "Ellipse",
+        layout: {},
+        paint: {
+          "fill-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "blue",
+            "red",
+          ], // blue color fill
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            0.5,
+          ],
+          "fill-outline-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "blue",
+            "red",
+          ],
+        },
+      });
+    }
+
+    if (Ellipse.size > 0) {
+      let Features: GeoJSON.Feature<GeoJSON.Geometry>[] = [];
+      Ellipse.forEach((value, key, map) => {
+        let feat: GeoJSON.Feature<GeoJSON.Geometry> = {
+          type: "Feature",
+          id: key.toString(),
+          properties: {
+            name: key,
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [value],
+          },
+        };
+        Features.push(feat);
+      });
+
+      let map = this.map?.getSource("Ellipse") as GeoJSONSource;
+
+      if (map) {
+        map.setData({
+          type: "FeatureCollection",
+          features: Features,
+        });
+      }
+    } else {
+      let map = this.map?.getSource("Ellipse") as GeoJSONSource;
+      if (map) {
+        map.setData({
+          type: "FeatureCollection",
+          features: [],
+        });
+      }
+    }
+  }
 }

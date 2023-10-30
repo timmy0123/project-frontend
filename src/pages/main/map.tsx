@@ -34,12 +34,22 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
   const [zoom, setZoom] = React.useState(5);
   const { lng, lat } = { lng: -2, lat: 55 };
   const mapApi = React.useRef(new MapAPIContent(map.current));
-  const { eventStatistic, Line, Point, Polygon, setLoaded } = useCellContent();
+  const {
+    eventStatistic,
+    Line,
+    Point,
+    Polygon,
+    Ellipse,
+    setLoaded,
+    displayEllipse,
+    displayPolygon,
+  } = useCellContent();
 
   React.useEffect(() => {
     mapApi.current.drawLine(Line);
     mapApi.current.drawPoint(Point);
     mapApi.current.drawArea(Polygon);
+    mapApi.current.drawEllipse(Ellipse);
   }, [Line]);
   React.useEffect(() => {
     if (!map.current) {
@@ -49,6 +59,128 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
         center: [lng, lat],
         zoom,
       });
+
+      map.current.on("load", () => {
+        map.current!.addSource("Track", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+        });
+        map.current!.addLayer({
+          id: "Track",
+          type: "line",
+          source: "Track",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "#888",
+            ],
+            "line-width": 2,
+          },
+        });
+
+        map.current!.addSource("Cell", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+        });
+        map.current!.addLayer({
+          id: "Cell",
+          type: "circle",
+          source: "Cell",
+          paint: {
+            "circle-radius": 5,
+            "circle-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "white",
+            ],
+            "circle-stroke-color": "black",
+            "circle-stroke-width": 2,
+          },
+          filter: ["in", "$type", "Point"],
+        });
+
+        map.current!.addSource("Area", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+        });
+        map.current!.addLayer({
+          id: "Area",
+          type: "fill",
+          source: "Area",
+          layout: {},
+          paint: {
+            "fill-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "#0080ff",
+            ], // blue color fill
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              1,
+              0.5,
+            ],
+            "fill-outline-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "#0080ff",
+            ],
+          },
+        });
+
+        map.current!.addSource("Ellipse", {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+        });
+        map.current!.addLayer({
+          id: "Ellipse",
+          type: "fill",
+          source: "Ellipse",
+          layout: {},
+          paint: {
+            "fill-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "red",
+            ], // blue color fill
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              1,
+              0.5,
+            ],
+            "fill-outline-color": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              "blue",
+              "red",
+            ],
+          },
+        });
+      });
+
       mapApi.current.setMap(map.current);
     }
 
@@ -56,6 +188,22 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
     map.current.setZoom(zoom);
     setLoaded(true);
   }, [onLoaded]);
+
+  React.useEffect(() => {
+    map.current?.on("idle", () => {
+      if (!displayEllipse)
+        map.current?.setLayoutProperty("Ellipse", "visibility", "none");
+      else map.current?.setLayoutProperty("Ellipse", "visibility", "visible");
+    });
+  }, [displayEllipse]);
+
+  React.useEffect(() => {
+    map.current?.on("idle", () => {
+      if (!displayPolygon)
+        map.current?.setLayoutProperty("Area", "visibility", "none");
+      else map.current?.setLayoutProperty("Area", "visibility", "visible");
+    });
+  }, [displayPolygon]);
   return (
     <>
       <StyledMap ref={mapContainer} />

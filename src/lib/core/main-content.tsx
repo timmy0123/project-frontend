@@ -72,6 +72,12 @@ export interface cellObjecttype {
   setPoint: React.Dispatch<React.SetStateAction<Map<string, number[]>>>;
   Polygon: Map<string, number[][]>;
   setPolygon: React.Dispatch<React.SetStateAction<Map<string, number[][]>>>;
+  Ellipse: Map<string, number[][]>;
+  setEllipse: React.Dispatch<React.SetStateAction<Map<string, number[][]>>>;
+  displayPolygon: boolean;
+  setdisplayPolygon: React.Dispatch<boolean>;
+  displayEllipse: boolean;
+  setdisplayEllipse: React.Dispatch<boolean>;
 }
 
 interface content {
@@ -93,6 +99,12 @@ export const cellContext = React.createContext<cellObjecttype>({
   setPoint: _.noop,
   Polygon: new Map(),
   setPolygon: _.noop,
+  Ellipse: new Map(),
+  setEllipse: _.noop,
+  displayPolygon: false,
+  setdisplayPolygon: _.noop,
+  displayEllipse: false,
+  setdisplayEllipse: _.noop,
 });
 
 export const useCellContent = () => React.useContext(cellContext);
@@ -108,7 +120,12 @@ export const ObjectProvider = React.memo<content>(({ children }) => {
   const [Polygon, setPolygon] = React.useState<Map<string, number[][]>>(
     new Map()
   );
+  const [Ellipse, setEllipse] = React.useState<Map<string, number[][]>>(
+    new Map()
+  );
   const [Loaded, setLoaded] = React.useState<boolean>(false);
+  const [displayPolygon, setdisplayPolygon] = React.useState<boolean>(true);
+  const [displayEllipse, setdisplayEllipse] = React.useState<boolean>(true);
   return (
     <cellContext.Provider
       value={{
@@ -126,6 +143,12 @@ export const ObjectProvider = React.memo<content>(({ children }) => {
         setPoint,
         Polygon,
         setPolygon,
+        Ellipse,
+        setEllipse,
+        displayPolygon,
+        setdisplayPolygon,
+        displayEllipse,
+        setdisplayEllipse,
       }}
     >
       {children}
