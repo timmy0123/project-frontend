@@ -211,3 +211,5 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
     </>
   );
 });
+
+_Map.displayName = "_Map";

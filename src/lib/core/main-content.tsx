@@ -155,3 +155,5 @@ export const ObjectProvider = React.memo<content>(({ children }) => {
     </cellContext.Provider>
   );
 });
+
+ObjectProvider.displayName = "ObjectProvider";

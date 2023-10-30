@@ -97,6 +97,7 @@ export const MainContent: React.FC = ({}) => {
     Cell,
     setCell,
     Event,
+    setEvent,
     eventStatistic,
     Line,
     setLine,
@@ -110,6 +111,7 @@ export const MainContent: React.FC = ({}) => {
     setdisplayEllipse,
     displayPolygon,
     setdisplayPolygon,
+    seteventStatistic,
   } = useCellContent();
 
   const columns: GridColDef[] = [
@@ -163,7 +165,10 @@ export const MainContent: React.FC = ({}) => {
   };
 
   React.useEffect(() => {
-    q.queryEventStatistic(Region);
+    (async () => {
+      let res = await q.queryEventStatistic(Event, Region);
+      seteventStatistic(res);
+    })();
   }, [Event]);
 
   return (
@@ -347,28 +352,31 @@ export const MainContent: React.FC = ({}) => {
                         <Button
                           variant="outlined"
                           onClick={() => {
-                            const combinedStartDateTime =
-                              startDate && startTime
-                                ? startDate
-                                    .set("hour", startTime.hour())
-                                    .set("minute", startTime.minute())
-                                : null;
-                            const combinedEndDateTime =
-                              endDate && endTime!
-                                ? endDate
-                                    .set("hour", endTime.hour())
-                                    .set("minute", endTime.minute())
-                                : null;
-                            q.queryEvent(
-                              combinedStartDateTime!.toISOString(),
-                              combinedEndDateTime!.toISOString()
-                            );
-                            generateTimeValue(
-                              combinedStartDateTime!,
-                              combinedEndDateTime!
-                            );
-                            setonQuery(false);
-                            setonTable(true);
+                            (async () => {
+                              const combinedStartDateTime =
+                                startDate && startTime
+                                  ? startDate
+                                      .set("hour", startTime.hour())
+                                      .set("minute", startTime.minute())
+                                  : null;
+                              const combinedEndDateTime =
+                                endDate && endTime!
+                                  ? endDate
+                                      .set("hour", endTime.hour())
+                                      .set("minute", endTime.minute())
+                                  : null;
+                              const res = await q.queryEvent(
+                                combinedStartDateTime!.toISOString(),
+                                combinedEndDateTime!.toISOString()
+                              );
+                              setEvent(res);
+                              generateTimeValue(
+                                combinedStartDateTime!,
+                                combinedEndDateTime!
+                              );
+                              setonQuery(false);
+                              setonTable(true);
+                            })();
                           }}
                         >
                           Query

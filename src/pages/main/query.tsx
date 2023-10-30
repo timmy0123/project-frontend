@@ -8,36 +8,23 @@ import {
 } from "@/lib/core/main-content";
 
 export class Query {
-  private Event: eventtype[];
-  private setEvent: React.Dispatch<React.SetStateAction<eventtype[]>>;
-  private eventStatistic: statistictype[];
-  private seteventStatistic: React.Dispatch<
-    React.SetStateAction<statistictype[]>
-  >;
-  constructor() {
-    const { Event, setEvent, eventStatistic, seteventStatistic } =
-      useCellContent();
-    this.Event = Event;
-    this.setEvent = setEvent;
-    this.eventStatistic = eventStatistic;
-    this.seteventStatistic = seteventStatistic;
-  }
+  constructor() {}
 
   public queryEvent = async (startTime: string, endTime: string) => {
     const response = await fetch(
       `http://localhost:5566/getEvents?startdate=${startTime}&enddate=${endTime}`
     );
     const result = await response.json();
-    this.setEvent(result);
+    return result;
   };
 
-  public queryEventStatistic = async (ProjName: string) => {
+  public queryEventStatistic = async (Event: eventtype[], ProjName: string) => {
     let tmp: statistictype[] = [];
-    let n = this.Event.length;
+    let n = Event.length;
     for (let i = 0; i < n; i++) {
-      let m = this.Event[i].cells.length;
+      let m = Event[i].cells.length;
       for (let j = 0; j < m; j++) {
-        let InitCell = this.Event[i].cells[j];
+        let InitCell = Event[i].cells[j];
         const response = await fetch(
           `http://localhost:5566/getStatistic?id=${InitCell}&ProjName=${ProjName}`
         );
@@ -46,7 +33,7 @@ export class Query {
         tmp.push(result);
       }
     }
-    this.seteventStatistic(tmp);
+    return tmp;
   };
 
   public queryTrack = async (id: string): Promise<string[][] | undefined> => {

@@ -16,7 +16,10 @@ export const ColorModeContext = React.createContext<IColorModeContext>({
 
 export const useColorMode = () => React.useContext(ColorModeContext);
 
-export const ColorModeProvider = React.memo(({ children }) => {
+interface colortype {
+  children: any;
+}
+export const ColorModeProvider = React.memo<colortype>(({ children }) => {
   const [mode, setMode] = React.useState<PaletteMode>(defaultColorMode);
   const value: IColorModeContext = {
     toggleColorMode: () => {
@@ -30,3 +33,5 @@ export const ColorModeProvider = React.memo(({ children }) => {
     </ColorModeContext.Provider>
   );
 });
+
+ColorModeProvider.displayName = "ColorModeProvider";
