@@ -26,16 +26,18 @@ import dayjs, { Dayjs } from "dayjs";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import utc from "dayjs/plugin/utc";
 import { Query } from "../../lib/query/query";
-import { useCellContent } from "@/lib/core/main-content";
+import { eventtype, useCellContent } from "@/lib/core/main-content";
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
-import { statistictype } from "../../lib/core/main-content";
+import { statistictype, properityType } from "../../lib/core/main-content";
 import { StylesProvider } from "@material-ui/core/styles";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import SearchIcon from "@mui/icons-material/Search";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LayersIcon from "@mui/icons-material/Layers";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import JSZip from "jszip";
 
 dayjs.extend(utc);
 
@@ -50,12 +52,45 @@ const useStyles = makeStyles({
   },
 });
 
+interface fileType {
+  name: string;
+  content: string;
+}
+
+const downloadZip = async (files: fileType[]) => {
+  const zip = new JSZip();
+
+  // Add files to the zip
+  files.forEach((file) => {
+    zip.file(file.name, file.content);
+  });
+
+  // Generate the zip file asynchronously
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+
+  // Create a download link and trigger the download
+  const downloadLink = window.URL.createObjectURL(zipBlob);
+  const link = document.createElement("a");
+  link.href = downloadLink;
+  link.download = "files.zip";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const MainContent: React.FC = ({}) => {
   const q = new Query();
   const [onQuery, setonQuery] = React.useState<boolean>(true);
   const [onTable, setonTable] = React.useState<boolean>(false);
   const [onLayer, setonLayer] = React.useState<boolean>(false);
+  const [onDownload, setonDownload] = React.useState<boolean>(false);
   const [selectRow, setselectRow] = React.useState<GridRowSelectionModel>([]);
+  const [selectEvent, setselectEvent] = React.useState<Map<string, string[][]>>(
+    new Map()
+  );
+  const [selectCell, setselectCell] = React.useState<
+    Map<String, properityType>
+  >(new Map());
   const [startDate, setstartDate] = React.useState<Dayjs | null>(
     dayjs("2019-07-25").utc()
   );
@@ -214,6 +249,7 @@ export const MainContent: React.FC = ({}) => {
                         setonQuery(true);
                         setonTable(false);
                         setonLayer(false);
+                        setonDownload(false);
                       }}
                     >
                       <SearchIcon />
@@ -234,6 +270,7 @@ export const MainContent: React.FC = ({}) => {
                         setonQuery(false);
                         setonTable(true);
                         setonLayer(false);
+                        setonDownload(false);
                       }}
                     >
                       <ListAltIcon />
@@ -254,9 +291,26 @@ export const MainContent: React.FC = ({}) => {
                         setonQuery(false);
                         setonTable(false);
                         setonLayer(true);
+                        setonDownload(false);
                       }}
                     >
                       <LayersIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Download" placement="right" arrow>
+                    <IconButton
+                      sx={{
+                        backgroundColor: onDownload ? "#C0C0C0" : "none",
+                      }}
+                      onClick={() => {
+                        setshowTool(true);
+                        setonQuery(false);
+                        setonTable(false);
+                        setonLayer(false);
+                        setonDownload(true);
+                      }}
+                    >
+                      <FileDownloadIcon />
                     </IconButton>
                   </Tooltip>
                 </Stack>
@@ -407,6 +461,9 @@ export const MainContent: React.FC = ({}) => {
                           let _polygon: Map<string, number[][]> = new Map();
                           let _ellipse: Map<string, number[][]> = new Map();
                           let _line: Map<string, number[][]> = new Map();
+                          let _selectCell: Map<string, properityType> =
+                            new Map();
+                          let _selectTrack: Map<string, string[][]> = new Map();
                           let n = newSelection.length;
                           if (n == 0) {
                             setLine(_line);
@@ -415,12 +472,18 @@ export const MainContent: React.FC = ({}) => {
                             setallPoint(_point);
                             setPolygon(_polygon);
                             setallPolygon(_polygon);
+                            setEllipse(_ellipse);
+                            setallEllipse(_ellipse);
                           } else {
                             for (let i = 0; i < n; i++) {
                               let lifespans = await q.queryTrack(
                                 newSelection[i] as string
                               );
                               if (lifespans) {
+                                _selectTrack.set(
+                                  newSelection[i] as string,
+                                  lifespans
+                                );
                                 let m = lifespans.length;
                                 for (let j = 0; j < m; j++) {
                                   let l = lifespans[j].length;
@@ -437,6 +500,13 @@ export const MainContent: React.FC = ({}) => {
                                       area = Cell.get(
                                         lifespans[j][k]
                                       )!.cellPolygon;
+                                      fitEllipse = Cell.get(
+                                        lifespans[j][k]
+                                      )!.ellipse;
+                                      _selectCell.set(
+                                        lifespans[j][k],
+                                        Cell.get(lifespans[j][k])!
+                                      );
                                     } else {
                                       let res = await q.queryProp(
                                         lifespans[j][k] as string,
@@ -444,6 +514,7 @@ export const MainContent: React.FC = ({}) => {
                                       );
                                       if (res) {
                                         Cell.set(lifespans[j][k], res);
+                                        _selectCell.set(lifespans[j][k], res);
                                         setCell(Cell);
                                         coord = [
                                           res!.elHist.ctrd1,
@@ -471,6 +542,8 @@ export const MainContent: React.FC = ({}) => {
                                 }
                               }
                             }
+                            setselectCell(_selectCell);
+                            setselectEvent(_selectTrack);
                             setPoint(_point);
                             setallPoint(_point);
                             setLine(_line);
@@ -484,7 +557,7 @@ export const MainContent: React.FC = ({}) => {
                       />
                     </Box>
                   </Stack>
-                ) : (
+                ) : onLayer ? (
                   <Stack width="95%" spacing={2} marginTop={1} marginLeft={1}>
                     <Typography variant="h6">Layer</Typography>
                     <Divider />
@@ -502,6 +575,30 @@ export const MainContent: React.FC = ({}) => {
                         }}
                       />
                     </FormGroup>
+                  </Stack>
+                ) : (
+                  <Stack width="95%" spacing={2} marginTop={1} marginLeft={1}>
+                    <Typography variant="h6">Download</Typography>
+                    <Divider />
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        const eventJson = JSON.stringify(
+                          Object.fromEntries(selectEvent)
+                        );
+                        const cellJson = JSON.stringify(
+                          Object.fromEntries(selectCell)
+                        );
+                        (async () => {
+                          await downloadZip([
+                            { name: "track.json", content: eventJson },
+                            { name: "property.json", content: cellJson },
+                          ]);
+                        })();
+                      }}
+                    >
+                      Download
+                    </Button>
                   </Stack>
                 )}
               </Box>
