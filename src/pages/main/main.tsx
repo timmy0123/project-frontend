@@ -14,6 +14,7 @@ import {
   Divider,
   Tooltip,
   FormGroup,
+  Modal,
 } from "@mui/material";
 import Slider from "@mui/material/Slider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -36,6 +37,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import SearchIcon from "@mui/icons-material/Search";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LayersIcon from "@mui/icons-material/Layers";
+import InfoIcon from "@mui/icons-material/Info";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import JSZip from "jszip";
 
@@ -84,6 +86,7 @@ export const MainContent: React.FC = ({}) => {
   const [onTable, setonTable] = React.useState<boolean>(false);
   const [onLayer, setonLayer] = React.useState<boolean>(false);
   const [onDownload, setonDownload] = React.useState<boolean>(false);
+  const [openAboutFile, setopenAboutFile] = React.useState<boolean>(false);
   const [selectRow, setselectRow] = React.useState<GridRowSelectionModel>([]);
   const [selectEvent, setselectEvent] = React.useState<Map<string, string[][]>>(
     new Map()
@@ -580,6 +583,128 @@ export const MainContent: React.FC = ({}) => {
                   <Stack width="95%" spacing={2} marginTop={1} marginLeft={1}>
                     <Typography variant="h6">Download</Typography>
                     <Divider />
+                    <Grid container>
+                      <Grid
+                        item
+                        xs={6}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography variant="body1">
+                          About Download Files
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                          }}
+                        >
+                          <IconButton onClick={() => setopenAboutFile(true)}>
+                            <InfoIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                    <Modal
+                      open={openAboutFile}
+                      onClose={() => setopenAboutFile(false)}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute" as "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: 800,
+                          height: 500,
+                          bgcolor: "background.paper",
+                          border: "2px solid #000",
+                          boxShadow: 24,
+                          p: 4,
+                        }}
+                      >
+                        <Grid container>
+                          <Grid
+                            item
+                            xs={6}
+                            sx={{ display: "flex", alignItems: "center" }}
+                          >
+                            <Typography
+                              id="modal-modal-title"
+                              variant="h6"
+                              component="h2"
+                            >
+                              About Download Files
+                            </Typography>
+                          </Grid>
+                          <Grid
+                            item
+                            xs={6}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <IconButton onClick={() => setopenAboutFile(false)}>
+                              <CloseIcon />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          There are two files will be download. One is the
+                          tracked path of raincell, another one is rain cell's
+                          property.
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          <span style={{ fontWeight: "bold", color: "blue" }}>
+                            The tracked path file
+                          </span>{" "}
+                          contains a chronological list of unique identifiers
+                          representing rain cells at different time steps. For
+                          example:
+                        </Typography>
+                        <Typography
+                          id="modal-modal-description"
+                          sx={{
+                            mt: 2,
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          "201907240955_1_0" :
+                          ["201907240955_1_0","201907241000_2_0","201907241005_1_0"]
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          "201907240955_1_0" is rain cell's id, where
+                          "201907240955" indicates the time, "1" represents the
+                          lab, and "0" represents the lev.
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          The initial rain cell, indicated by
+                          "201907240955_1_0," serves as the key for the tracked
+                          path. This key is associated with a list of subsequent
+                          time steps where the rain cell has been tracked.
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                          <span style={{ fontWeight: "bold", color: "blue" }}>
+                            The property file
+                          </span>{" "}
+                          contains rain cell's properties which is calculated
+                          from object-based model including attributes such as
+                          area, smjr, smnr, etc. Each property set is associated
+                          with a unique rain cell ID, which serves as the key
+                          for identification and reference.
+                        </Typography>
+                      </Box>
+                    </Modal>
                     <Button
                       variant="outlined"
                       onClick={() => {
