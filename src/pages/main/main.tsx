@@ -426,7 +426,8 @@ export const MainContent: React.FC = ({}) => {
                                   : null;
                               const res = await q.queryEvent(
                                 combinedStartDateTime!.toISOString(),
-                                combinedEndDateTime!.toISOString()
+                                combinedEndDateTime!.toISOString(),
+                                Region
                               );
                               setEvent(res);
                               generateTimeValue(

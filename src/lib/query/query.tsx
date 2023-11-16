@@ -10,9 +10,13 @@ import {
 export class Query {
   constructor() {}
 
-  public queryEvent = async (startTime: string, endTime: string) => {
+  public queryEvent = async (
+    startTime: string,
+    endTime: string,
+    region: string
+  ) => {
     const response = await fetch(
-      `http://localhost:5566/getEvents?startdate=${startTime}&enddate=${endTime}`
+      `http://localhost:5566/getEvents?startdate=${startTime}&enddate=${endTime}&region=${region}`
     );
     const result = await response.json();
     return result;
