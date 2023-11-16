@@ -710,17 +710,31 @@ export const MainContent: React.FC = ({}) => {
                     <Button
                       variant="outlined"
                       onClick={() => {
-                        const eventJson = JSON.stringify(
-                          Object.fromEntries(selectEvent)
-                        );
+                        const files: fileType[] = [];
                         const cellJson = JSON.stringify(
                           Object.fromEntries(selectCell)
                         );
+                        selectEvent.forEach((value, key, map) => {
+                          const jsonContent = JSON.stringify(
+                            Object.fromEntries([[key, value]]),
+                            null,
+                            2
+                          );
+
+                          files.push({
+                            name: `${key}_track.json`,
+                            content: jsonContent,
+                          });
+                          files.push({
+                            name: `${key}_cell.json`,
+                            content: cellJson,
+                          });
+                        });
+                        //const eventJson = JSON.stringify(
+                        //  Object.fromEntries(selectEvent)
+                        //);
                         (async () => {
-                          await downloadZip([
-                            { name: "track.json", content: eventJson },
-                            { name: "property.json", content: cellJson },
-                          ]);
+                          await downloadZip(files);
                         })();
                       }}
                     >
