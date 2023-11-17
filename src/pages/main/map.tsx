@@ -33,7 +33,7 @@ export const _Map = React.memo<IMap>(({ onLoaded, children }) => {
   const mapContainer = React.useRef<HTMLDivElement>(null);
   const map = React.useRef<mapboxgl.Map>();
   const [zoom, setZoom] = React.useState(5);
-  const { lng, lat } = { lng: -2, lat: 55 };
+  const { lng, lat } = { lng: 120, lat: 21 };
   const mapApi = React.useRef(new MapAPIContent(map.current));
   const {
     eventStatistic,

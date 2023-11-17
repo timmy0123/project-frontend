@@ -356,6 +356,7 @@ export const MainContent: React.FC = ({}) => {
                           }}
                         >
                           <MenuItem value={"UK"}>UK</MenuItem>
+                          <MenuItem value={"TW"}>TW</MenuItem>
                         </Select>
                       </Grid>
                     </Grid>
